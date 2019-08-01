@@ -1,0 +1,137 @@
+{% extends 'consumption/layout.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="box box-solid box-primary">
+    <div class="box-header with-border">
+        <h1>User</h1>
+    </div>
+    <div class="box-body with-border">
+        <div class="row">
+            <div class="col-4">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3>
+                            {{ user.id }}
+                        </h3>
+                    </div>
+                    <div class="box-body">
+                        <div>
+                            <b>Area Code:</b>
+                            {{ user.area_code }}
+                        </div>
+                        <div>
+                            <b>Tariff Code:</b>
+                            {{ user.tariff_code }}
+                        </div>
+                        <div>
+                            <b>Total Consumption:</b>
+                            {{ consumption.total|floatformat:2|intcomma }}
+                        </div>
+                        <div>
+                            <b>Average Monthly Consumption:</b>
+                            {{ consumption.average|floatformat:2|intcomma }}
+                        </div>
+                    </div>
+                    <button class="btn btn-default" onclick="window.history.back()">Back</button>
+                </div>
+            </div>
+            <div class="col-4">
+                <div id="chart_parent">
+                    <canvas id="chart" width="200" height="100"></canvas>
+                </div>
+            </div>
+            <div class="col-4">
+                <canvas id="chart" width="200" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function updateChart(barData, lineData){
+        // updates chart from datatable current page rows
+        // remove exsisting chart (which might be populated)
+        $("#chart").remove();
+        // add an empty chart canvas
+        $("#chart_parent").append("<canvas id='chart' width='200' height='100'><p>here</p></canvas>");
+        var chart_line = [];
+        var chart_labels = [];
+        var chart_data = [];
+        var chart_colors = [];
+        // prepare chart data from datatable current page
+        barData.forEach(element => {
+            chart_labels.push(element.year_month);
+            chart_data.push(element.total);
+            chart_colors.push(getRandomColor());
+        });
+        if (lineData != []){
+                lineData.forEach(element => {
+                chart_line.push(element.sum/element.count);
+            });
+        }
+        // initialize the chart with data, labels and colors
+        var ctx = document.getElementById('chart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type:'bar',
+            data: {
+                labels: chart_labels,
+                datasets: [
+                    {
+                        label: 'Average',
+                        type: 'line',
+                        data: chart_line,
+                        // backgroundColor: 'lightcoral',
+                        color: 'red',
+                    },
+                    {
+                        data: chart_data,
+                        backgroundColor: chart_colors,
+                    },
+                ]
+            },
+            // enhance datatable options
+            options: {
+                title: {
+                    display: true,
+                    text: 'Total Consumption per Month VS Average (line)',
+                    fontSize: '14',
+                },
+                legend: {
+                    display: false,
+                },    
+            }
+        });
+    }
+    $(document).ready(function() {
+        // retreives data and populate datatable (on ready)
+        function getLineData(barData){
+            $.getJSON("{% url 'api_monthly_consumption' %}", {
+                format: "json",
+            }).done(function(json){
+                updateChart(barData, json);
+            }).fail(function(error){
+                console.log('failed fetching line data!');
+                console.log(error);
+                updateChart(barData, []);
+            })
+        }
+        function getBarData(){
+            $.getJSON("{% url 'api_user_consumption' user.id %}", {
+                format: "json",
+            })
+            .done(function(json) {
+                // populate datatable
+                getLineData(json);
+            })
+            .fail(function(error) {
+                console.log('failed fetching bar data!');
+            });
+        }
+        getBarData();
+
+    });
+</script>
+{% endblock scripts %}

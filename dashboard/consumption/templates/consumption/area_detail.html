@@ -1,0 +1,107 @@
+{% extends 'consumption/layout.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="box box-solid box-primary">
+    <div class="box-header with-border">
+        <h1>Area</h1>
+    </div>
+    <div class="box-body with-border">
+        <div class="row">
+            <div class="col-4">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3>
+                            {{ area_code }}
+                        </h3>
+                    </div>
+                    <div class="box-body">
+                        <div>
+                            <b>Area Code:</b>
+                            {{ area_code }}
+                        </div>
+                        <div>
+                            <b>Total Consumption:</b>
+                            {{ consumption.total|floatformat:2|intcomma }}
+                        </div>
+                        <div>
+                            <b>Average Monthly User Consumption:</b>
+                            {{ consumption.average|floatformat:2|intcomma }}
+                        </div>
+                    </div>
+                    <button class="btn btn-default" onclick="window.history.back()">Go Back</button>
+                </div>
+            </div>
+            <div class="col-4">
+                <div id="chart_parent">
+                    <canvas id="chart" width="200" height="100"></canvas>
+                </div>
+            </div>
+            <div class="col-4">
+                <canvas id="chart" width="200" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+<script>
+    function updateChart(json){
+        // updates chart from datatable current page rows
+        // remove exsisting chart (which might be populated)
+        $("#chart").remove();
+        // add an empty chart canvas
+        $("#chart_parent").append("<canvas id='chart' width='200' height='100'><p>here</p></canvas>");
+        var chart_labels = [];
+        var chart_data = [];
+        var chart_colors = [];
+        // prepare chart data from datatable current page
+        json.forEach(element => {
+            chart_labels.push(element.year_month);
+            chart_data.push(element.total);
+            chart_colors.push(getRandomColor());
+        });
+        // initialize the chart with data, labels and colors
+        var ctx = document.getElementById('chart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type:'bar',
+            data: {
+                labels: chart_labels,
+                datasets: [
+                    {
+                        data: chart_data,
+                        backgroundColor: chart_colors,
+                    },
+                ]
+            },
+            // enhance datatable options
+            options: {
+                title: {
+                    display: true,
+                    text: 'Total Consumption per Month',
+                    fontSize: '14',
+                },
+                legend: {
+                    display: false,
+                },    
+            }
+        });
+    }
+    $(document).ready(function() {
+        // retreives data and populate datatable (on ready)
+        function getBarData(){
+            $.getJSON("{% url 'api_area' area_code %}", {
+                format: "json",
+            })
+            .done(function(json) {
+                // populate datatable
+                updateChart(json);
+            })
+            .fail(function(json) {
+                console.log('failed');
+            });
+        }
+        getBarData();
+    });
+</script>
+{% endblock %}

@@ -1,8 +1,26 @@
 <!DOCTYPE html>
+{% load static %}
 <html>
   <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
   </head>
   <body>
-    {% block content %}{% endblock content %}
+    <div class="container-fluid">
+        {% block content %}{% endblock content %}
+    </div>
+    {% block js %}
+
+    <script type="text/javascript" src="{% static 'js/jquery-3.3.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.datatables-1.10.19.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/chart-2.8.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-4.0.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+
+    {% endblock js %}
+
+    {% block scripts %}
+    {% endblock scripts %}
   </body>
+
 </html>

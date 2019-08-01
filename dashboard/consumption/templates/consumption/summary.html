@@ -1,7 +1,127 @@
 {% extends 'consumption/layout.html' %}
 
 {% block content %}
-
-<h1>{{message}}</h1>
-
+<div class="box box-solid box-primary">
+    <div class="box-header with-border">
+        <h1>Users Consumption</h1>
+    </div>
+    <div class="box-body with-border">
+        <div class="row">
+            <div class="col-4">
+                <div class="table-responsive">
+                    <table id="data-table" class="display">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Area code</th>
+                                <th>Tariff code</th>
+                                <th>Total</th>
+                                <th>Average</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="col-8">
+                <div id="chart_parent">
+                    <canvas id="chart" width="200" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    function updateChart(dt){
+        // updates chart from datatable current page rows
+        // remove exsisting chart (which might be populated)
+        $("#chart").remove();
+        // add an empty chart canvas
+        $("#chart_parent").append("<canvas id='chart' width='200' height='100'><p>here</p></canvas>");
+        var chart_labels = [];
+        var chart_data = [];
+        var chart_colors = [];
+        // prepare chart data from datatable current page
+        dt.rows({page:'current'}).every(function(index) {
+            chart_labels.push(dt.cell(index,0).data());
+            chart_data.push(Number(dt.cell(index,3).data()));
+            // get a random color !!
+            var color = getRandomColor();
+            $(dt.cell(index, 3).node()).css('color', color);
+            chart_colors.push(color);
+        });
+        // initialize the chart with data, labels and colors
+        var ctx = document.getElementById('chart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type:'bar',
+            data: {
+                labels: chart_labels,
+                datasets: [
+                    {
+                        data: chart_data,
+                        backgroundColor: chart_colors,
+                    },
+                ]
+            },
+            // enhance datatable options
+            options: {
+                title: {
+                    display: true,
+                    text: 'Totals',
+                    fontSize: '14',
+                },
+                legend: {
+                    display: false,
+                },    
+            }
+        });
+    }
+    function populateDatatable(json){
+        // populates datatable data from json response
+        var dt = $('#data-table').DataTable( {
+            lengthMenu: [10, 25, 50, 100, 500, 1000],
+            pageLength: 10,
+            data: json,
+            columns: [
+                {
+                    data: 'pk',
+                    render: function(data, type, row, meta){
+                        return '<a href="/user/detail/' + data + '">' + data + '</a>'
+                    }
+                },
+                {
+                    data: 'area_code',
+                    render: function(data, type, row, meta){
+                        return '<a href="/area/detail/' + data + '">' + data + '</a>'
+                    }
+                },
+                {data: 'tariff_code' },
+                {
+                    data: 'total',
+                    render: $.fn.dataTable.render.number( ',', '.', 2 )
+                },
+                {
+                    data: 'average',
+                    render: $.fn.dataTable.render.number( ',', '.', 2 )
+                }
+            ]
+        });
+        dt.on('draw.dt', function () {
+            updateChart(dt);
+        });
+        updateChart(dt);
+    }
+    $(document).ready(function() {
+        // retreives data and populate datatable (on ready)
+        $.getJSON('{% url "api_consumption" %}', {
+            format: "json",
+        })
+        .done(function(json) {
+            // populate datatable
+            populateDatatable(json);
+        });
+    });
+</script>
+{% endblock scripts %}
