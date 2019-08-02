@@ -15,6 +15,7 @@ from consumption.serializers import (
     UserSerializer, UserSummarySerializer, AreaSummarySerializer)
 
 
+# API rest views
 @api_view(["GET"])
 def consumption_view(request):
     """returns JSON user summary (via DRF) and custom serializer"""
@@ -42,6 +43,7 @@ def area_data_by_month(request, area_code):
     return JsonResponse(data, safe=False)
 
 
+# Page Views
 def dashboard(request):
     """returns dashboard page"""
     return render(request, 'consumption/summary.html')
