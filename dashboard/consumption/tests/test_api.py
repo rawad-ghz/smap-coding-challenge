@@ -52,6 +52,12 @@ class APITest(APITestCase):
         # required
         cls.cls_atomics = cls._enter_atomics()
 
+    @classmethod
+    def tearDownClass(cls):
+        """tear down test data"""
+        # deletes UserConsumption instances as well
+        User.objects.all().delete()
+
     def test_users_inserted(self):
         self.assertEqual(User.objects.count(), 5)
 

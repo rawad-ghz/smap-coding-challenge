@@ -17,6 +17,12 @@ class TestViews(TestCase):
         # required
         cls.cls_atomics = cls._enter_atomics()
 
+    @classmethod
+    def tearDownClass(cls):
+        """tear down test data"""
+        # deletes UserConsumption instances as well
+        User.objects.all().delete()
+
     def test_home(self):
         client = Client()
         response = client.get(reverse('dashboard'))
