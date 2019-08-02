@@ -74,7 +74,7 @@ class Command(BaseCommand):
             with transaction.atomic():
                 for row in reader:
                     pk, area, tariff = row
-                    user_id=int(pk)
+                    user_id = int(pk)
                     # create the user if not exists
                     _, created = User.objects.get_or_create(
                         id=user_id,

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render, get_object_or_404
-from django.core.paginator import Paginator
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.generic import DetailView
 
@@ -10,9 +9,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from consumption import queries
-from consumption.models import User, UserConsumption
-from consumption.serializers import (
-    UserSerializer, UserSummarySerializer, AreaSummarySerializer)
+from consumption.models import User
+from consumption.serializers import UserSummarySerializer
 
 
 # API rest views

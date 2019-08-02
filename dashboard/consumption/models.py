@@ -22,6 +22,7 @@ class User(models.Model):
             maximum=Max('userconsumption__consumption'),
         )[0]
 
+
 class UserConsumption(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     start = models.DateTimeField()

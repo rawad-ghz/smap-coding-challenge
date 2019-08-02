@@ -23,7 +23,7 @@ whereas consistency is key in corporate and collaborative software development.
 Having installed and activated a python 3.6 virtual environment the application can be initialized using:
 
 ```sh
-(env) $ pip install -r requirements.txt
+(env) $ python -m pip install -r requirements.txt
 (env) $ cd dashboard
 (env) $ rm db.sqlite3
 (env) $ python manage.py migrate
@@ -113,11 +113,20 @@ Basic application tests covering REST API, Views and Management Command tests ca
 ```sh
 (env) $ python manage.py test
 ```
+
 ## Notes (on testing)
 
 `setUpClass` _class method_ is used instead of `setUp` _instance method_ to populate _Test fixtures_ **once** per class instead of being called before each test method.
 
 Similarly `tearDownClass` had been used to clean up _Test fixtures_.
+
+# Code Linting
+
+Basic PEP8 code linting via `flake8`, can be ran using the following:
+
+```sh
+(env) $ python -m flake8 .
+```
 
 # Enhancements
 
@@ -146,12 +155,14 @@ This limitation would be overcome when using RDBMS such as **Postgres**, where d
 
 # Production Notes
 
-In addition to the enhancement mentioned above, the application is certainly not suitable for deployment on production environments. Some of the reasons are it's lack of implementation of:
+In addition to the enhancement mentioned above, the application is certainly not suitable for deployment on production environments. Some of the reasons are it's lack of implementation/usage of:
 
 - **User Authentication**: user login and authentication mechanisms
 - **User Authorization**: user groups and permissions specifying user access rights to application pages and API
 - **Tests**: thorough applicaiton and API tests
 - **Browser Support**: testing the application on multiple browsers to ensure UI consistency
+- **Logging**: disabling debug=True and enabling logging
+- **Database**: a relational database management system for better performance and scalability
 
 regarding code.
 

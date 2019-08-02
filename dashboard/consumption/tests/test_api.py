@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+# noqa: E501
 """REST API tests"""
 from __future__ import unicode_literals
 
-from django.urls import reverse
 import datetime as dt
-from collections import OrderedDict
-import json
+
+from django.urls import reverse
 
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.views import status
@@ -35,16 +35,16 @@ class APITest(APITestCase):
             User(id=105, area_code='a2', tariff_code='t1'),
         ]
         consumptions = [
-            UserConsumption(user_id=101, consumption=100, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),
-            UserConsumption(user_id=101, consumption=200, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),
-            UserConsumption(user_id=102, consumption=300, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),
-            UserConsumption(user_id=102, consumption=400, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),
-            UserConsumption(user_id=103, consumption=500, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),
-            UserConsumption(user_id=103, consumption=600, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),
-            UserConsumption(user_id=104, consumption=700, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),
-            UserConsumption(user_id=104, consumption=800, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),
-            UserConsumption(user_id=105, consumption=900, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),
-            UserConsumption(user_id=105, consumption=1000, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),
+            UserConsumption(user_id=101, consumption=100, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),  # noqa
+            UserConsumption(user_id=101, consumption=200, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),  # noqa
+            UserConsumption(user_id=102, consumption=300, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),  # noqa
+            UserConsumption(user_id=102, consumption=400, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),  # noqa
+            UserConsumption(user_id=103, consumption=500, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),  # noqa
+            UserConsumption(user_id=103, consumption=600, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),  # noqa
+            UserConsumption(user_id=104, consumption=700, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),  # noqa
+            UserConsumption(user_id=104, consumption=800, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),  # noqa
+            UserConsumption(user_id=105, consumption=900, start=datetime('2019-01-01 00:00:00'), end=datetime('2019-01-01 00:30:00')),  # noqa
+            UserConsumption(user_id=105, consumption=1000, start=datetime('2019-01-01 00:30:00'), end=datetime('2019-01-01 01:00:00')),  # noqa
         ]
         User.objects.bulk_create(users)
         UserConsumption.objects.bulk_create(consumptions)
@@ -69,14 +69,14 @@ class APITest(APITestCase):
         client = APIClient()
         response = client.get(reverse('api_consumption'), format='json')
         expected = [
-            dict(pk='101', tariff_code='t1', area_code='a1', average=150.0, total=300.0),
-            dict(pk='102', tariff_code='t2', area_code='a1', average=350.0, total=700.0),
-            dict(pk='103', tariff_code='t1', area_code='a2', average=550.0, total=1100.0),
-            dict(pk='104', tariff_code='t1', area_code='a2', average=750.0, total=1500.0),
-            dict(pk='105', tariff_code='t1', area_code='a2', average=950.0, total=1900.0),
+            dict(pk='101', tariff_code='t1', area_code='a1', average=150.0, total=300.0),  # noqa
+            dict(pk='102', tariff_code='t2', area_code='a1', average=350.0, total=700.0),  # noqa
+            dict(pk='103', tariff_code='t1', area_code='a2', average=550.0, total=1100.0),  # noqa
+            dict(pk='104', tariff_code='t1', area_code='a2', average=750.0, total=1500.0),  # noqa
+            dict(pk='105', tariff_code='t1', area_code='a2', average=950.0, total=1900.0),  # noqa
         ]
         serializer = UserSummarySerializer(expected, many=True)
-        self.assertSequenceEqual(response.data, expected)
+        self.assertSequenceEqual(serializer.data, expected)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_monthly_api(self):
@@ -104,7 +104,13 @@ class APITest(APITestCase):
         client = APIClient()
         response = client.get(reverse('api_area', args=['a1']))
         expected = [
-            dict(year_month='2019-01', average=250.0, total=1000.0, minimum=100, maximum=400)
+            dict(
+                year_month='2019-01',
+                average=250.0,
+                total=1000.0,
+                minimum=100,
+                maximum=400,
+            )
         ]
         self.assertSequenceEqual(response.json(), expected)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
